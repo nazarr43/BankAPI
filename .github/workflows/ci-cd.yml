@@ -1,0 +1,54 @@
+name: CI/CD Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0'
+      
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Restore dependencies
+        run: |
+          cd WebAPI/WebAPI
+          dotnet restore
+
+      - name: Build
+        run: |
+          cd WebAPI/WebAPI
+          dotnet build --no-restore --configuration Release
+
+      - name: Run unit tests
+        run: |
+          cd WebAPI/WebAPI  
+          dotnet test --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=unit_test_results.trx"
+
+      - name: Publish unit test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: unit-test-results
+          path: '**/unit_test_results.trx'
+
+      - name: Build Docker image
+        run: docker build -t nazar3253/webapi:latest .
+
+      - name: Login to DockerHub
+        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Push Docker image to DockerHub
+        run: docker push nazar3253/webapi:latest
