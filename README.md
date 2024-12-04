@@ -58,12 +58,4 @@ This project is designed using a **microservices architecture**, which allows fo
 - **Integration Service**: Imports data from external systems in various formats (XML, JSON).
 - **Logging & Monitoring**: Utilizes **ELK Stack**, **Grafana**, **Prometheus**, and **OpenTelemetry** for comprehensive monitoring, logging, and observability.
 
-## How to Run Locally
 
-### Prerequisites
-- **.NET Core 8.0** or later.
-- **PostgreSQL** or any other supported database.
-- **Docker** (for containerization).
-- **Kafka** (for messaging between services).
-- **Redis** (for caching).
-- **YARP** for reverse proxy functionality.
